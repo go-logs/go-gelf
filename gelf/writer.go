@@ -12,6 +12,7 @@ type Writer interface {
 	Close() error
 	Write([]byte) (int, error)
 	WriteMessage(*Message) error
+	Dial(string) (net.Conn, error)
 }
 
 // Writer implements io.Writer and is used to send both discrete

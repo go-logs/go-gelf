@@ -20,6 +20,10 @@ type TCPWriter struct {
 	ReconnectDelay time.Duration
 }
 
+func (w *TCPWriter) Dial(addr string) (net.Conn, error) {
+	return net.Dial("tcp", w.addr)
+}
+
 func NewTCPWriter(addr string) (*TCPWriter, error) {
 	var err error
 	w := new(TCPWriter)
@@ -28,7 +32,7 @@ func NewTCPWriter(addr string) (*TCPWriter, error) {
 	w.proto = "tcp"
 	w.addr = addr
 
-	if w.conn, err = net.Dial("tcp", addr); err != nil {
+	if w.conn, err = w.Dial(addr); err != nil {
 		return nil, err
 	}
 	if w.hostname, err = os.Hostname(); err != nil {
@@ -90,7 +94,7 @@ func (w *TCPWriter) writeToSocketWithReconnectAttempts(zBytes []byte) (n int, er
 		}
 		if err != nil {
 			time.Sleep(w.ReconnectDelay * time.Second)
-			w.conn, errConn = net.Dial("tcp", w.addr)
+			w.conn, errConn = w.Dial(w.addr)
 		} else {
 			break
 		}
